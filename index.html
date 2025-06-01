@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agendamento Manicure Glamour</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <style>
     body {
       background: linear-gradient(180deg, #ffe6f0 0%, #ffcce0 100%);
@@ -17,14 +17,12 @@
       flex-direction: column;
       align-items: center;
     }
-
     h1 {
       font-size: 2rem;
       margin-bottom: 1.5rem;
       font-weight: 700;
       text-align: center;
     }
-
     form {
       max-width: 400px;
       width: 100%;
@@ -36,14 +34,16 @@
       flex-direction: column;
       gap: 1rem;
     }
-
     label {
       font-weight: 600;
       margin-bottom: 0.3rem;
       display: block;
     }
-
-    select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"] {
+    select,
+    input[type='date'],
+    input[type='time'],
+    input[type='text'],
+    input[type='tel'] {
       width: 100%;
       padding: 0.6rem 0.8rem;
       border-radius: 10px;
@@ -53,13 +53,11 @@
       background: #ffe6f2;
       color: #660033;
     }
-
     .buttons {
       display: flex;
       justify-content: space-between;
       gap: 1rem;
     }
-
     button {
       flex: 1;
       padding: 0.75rem;
@@ -71,7 +69,6 @@
       color: white;
       transition: background-color 0.3s ease;
     }
-
     button#send {
       background-color: #ff66b2;
     }
@@ -82,14 +79,12 @@
       background-color: #ff99cc88;
       cursor: not-allowed;
     }
-
     button#clear {
       background-color: #cc3366;
     }
     button#clear:hover:not(:disabled) {
       background-color: #b32d59;
     }
-
     .confirmation {
       background-color: #dff0d8;
       color: #3c763d;
@@ -107,7 +102,7 @@
     <div>
       <label for="service">Escolha o serviço</label>
       <select id="service" required>
-        <option value="">Carregando serviços...</option>
+        <option value="">Carregando...</option>
       </select>
     </div>
 
@@ -138,7 +133,13 @@
 
     <div>
       <label for="phone">Telefone</label>
-      <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required pattern="[0-9\s\-\+\(\)]{8,}" />
+      <input
+        type="tel"
+        id="phone"
+        placeholder="(xx) xxxxx-xxxx"
+        required
+        pattern="[0-9\s\-\+\(\)]{8,}"
+      />
     </div>
 
     <div class="buttons">
@@ -147,7 +148,10 @@
     </div>
   </form>
 
-  <div class="confirmation" id="confirmation">✅ Seu agendamento foi enviado com sucesso! Aguarde nossa confirmação pelo WhatsApp.</div>
+  <div
+    class="confirmation"
+    id="confirmation"
+  >✅ Seu agendamento foi enviado com sucesso! Aguarde nossa confirmação pelo WhatsApp.</div>
 
   <script>
     const serviceSelect = document.getElementById('service');
@@ -162,31 +166,31 @@
 
     const whatsappNumber = '5521972654357';
 
-    // Atualiza o min do input date para hoje
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
     // Função para converter CSV para array de objetos
-    function csvToArray(str, delimiter = ',') {
-      const headers = str.slice(0, str.indexOf('\n')).split(delimiter);
-      const rows = str.slice(str.indexOf('\n') + 1).split('\n').filter(Boolean);
-
-      return rows.map(row => {
-        const values = row.split(delimiter);
+    function csvToArray(str) {
+      const lines = str.trim().split('\n');
+      const headers = lines[0].split('\t');
+      return lines.slice(1).map(line => {
+        const values = line.split('\t');
         const obj = {};
         headers.forEach((header, i) => {
-          obj[header.trim()] = values[i] ? values[i].trim() : '';
+          obj[header] = values[i];
         });
         return obj;
       });
     }
 
-    // URL do CSV do Google Sheets com cache buster
+    // URL do CSV público do Google Sheets
     const csvUrl =
       'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDs0vjAw22ifuApGA0x59Y5mvwy5Jl5SVHHkx08Z67RqeeDBMNZHFpnlXeAz9-bQKp2iTfc_aMrzPH/pub?output=csv';
-    const csvUrlNoCache = csvUrl + '&cacheBuster=' + new Date().getTime();
 
-    // Buscar dados da planilha e popular select
+    // Para evitar cache, adiciona timestamp na URL
+    const csvUrlNoCache = csvUrl + '&_=' + new Date().getTime();
+
+    // Carrega os produtos e popula o select
     fetch(csvUrlNoCache)
       .then(response => {
         if (!response.ok) throw new Error('Erro ao carregar CSV');
@@ -195,35 +199,42 @@
       .then(text => {
         const produtos = csvToArray(text);
 
-        // Limpa opções anteriores e adiciona padrão
         serviceSelect.innerHTML = '<option value="">Selecione</option>';
 
         produtos.forEach(prod => {
           if (prod['Nome'] && prod['Preço']) {
             const option = document.createElement('option');
             option.value = prod['Nome'];
-            option.textContent = `${prod['Nome']} - 💰 R$${prod['Preço']} - Categoria: ${prod['Categoria']}`;
+            option.textContent = `${prod['Nome']} - 💰 R$${prod['Preço']}`;
             serviceSelect.appendChild(option);
           }
         });
       })
       .catch(err => {
         console.error(err);
-        serviceSelect.innerHTML = '<option value="">Erro ao carregar serviços</option>';
+        serviceSelect.innerHTML =
+          '<option value="">Erro ao carregar serviços</option>';
       });
 
-    // Validação do formulário para habilitar botão
     function validateForm() {
-      sendBtn.disabled = !(serviceSelect.value && date.value && time.value && name.value && phone.value);
+      sendBtn.disabled = !(
+        serviceSelect.value &&
+        date.value &&
+        time.value &&
+        name.value &&
+        phone.value
+      );
     }
 
-    [serviceSelect, date, time, name, phone].forEach(el => el.addEventListener('input', validateForm));
+    [serviceSelect, date, time, name, phone].forEach(el =>
+      el.addEventListener('input', validateForm)
+    );
 
-    // Evento do botão enviar - abrir WhatsApp com mensagem formatada
     sendBtn.addEventListener('click', () => {
-      const profText = professional.value ? `👩‍🏫 *Profissional:* ${professional.value}\n` : '';
-      const msg = 
-`\ud83d\ude4b Olá! Gostaria de fazer um agendamento na *Manicure Glamour*.
+      const profText = professional.value
+        ? `👩‍🏫 *Profissional:* ${professional.value}\n`
+        : '';
+      const msg = `🙋 Olá! Gostaria de fazer um agendamento na *Manicure Glamour*.
 
 ✨ *Serviço:* ${serviceSelect.value}
 ${profText}📅 *Data:* ${date.value}
@@ -234,13 +245,14 @@ ${profText}📅 *Data:* ${date.value}
 
 Aguardo a confirmação! 👍`;
 
-      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
+      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(
+        msg
+      )}`;
       window.open(url, '_blank');
 
       confirmation.style.display = 'block';
     });
 
-    // Evento limpar formulário
     clearBtn.addEventListener('click', () => {
       serviceSelect.value = '';
       professional.value = '';
@@ -252,7 +264,6 @@ Aguardo a confirmação! 👍`;
       confirmation.style.display = 'none';
     });
 
-    // Inicializar validação
     validateForm();
   </script>
 </body>
