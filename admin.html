@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Painel Admin - Manicure Glamour</title>
   <style>
     body {
@@ -23,7 +23,7 @@
       border-radius: 10px;
       box-shadow: 0 0 10px #ff80bf99;
     }
-    label, input, button, select {
+    label, input, button {
       display: block;
       width: 100%;
       margin: 10px 0;
@@ -65,16 +65,16 @@
 
   <div id="login">
     <label for="senha">Senha:</label>
-    <input type="password" id="senha" placeholder="Digite a senha...">
+    <input type="password" id="senha" placeholder="Digite a senha..." />
     <button onclick="verificarSenha()">Entrar</button>
   </div>
 
   <div id="admin" class="hidden">
     <h2>Gerenciar Produtos</h2>
     <form onsubmit="adicionarProduto(event)">
-      <input type="text" id="nome" placeholder="Nome do produto" required>
-      <input type="number" step="0.01" id="preco" placeholder="Preço" required>
-      <input type="text" id="categoria" placeholder="Categoria" required>
+      <input type="text" id="nome" placeholder="Nome do produto" required />
+      <input type="number" step="0.01" id="preco" placeholder="Preço" required />
+      <input type="text" id="categoria" placeholder="Categoria" required />
       <button type="submit">Adicionar Produto</button>
     </form>
 
@@ -92,7 +92,7 @@
   </div>
 
   <script>
-    const URL = 'https://script.google.com/macros/s/AKfycbxEKBvz4smvfp4uMYsQU7w75egCfgaxsF-9lGlFDMGPjwfvipLj3KTftyPIh7bSyPHzaw/exec';
+    const URL = 'https://script.google.com/macros/s/AKfycbxYxDReswc6uediWolfNJk9_ppGi_Ckj0HpHt2-wJILl9brvTakTG7IkMF-qS7MUBfwLA/exec';
 
     function verificarSenha() {
       const senha = document.getElementById('senha').value;
@@ -114,9 +114,9 @@
       dados.forEach((item, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><input value="${item.Nome}" onchange="editarProduto(${index}, 'Nome', this.value)"></td>
-          <td><input type="number" step="0.01" value="${item['Preço']}" onchange="editarProduto(${index}, 'Preço', this.value)"></td>
-          <td><input value="${item.Categoria}" onchange="editarProduto(${index}, 'Categoria', this.value)"></td>
+          <td><input value="${item.Nome}" onchange="editarProduto(${index}, 'Nome', this.value)" /></td>
+          <td><input type="number" step="0.01" value="${item['Preço']}" onchange="editarProduto(${index}, 'Preço', this.value)" /></td>
+          <td><input value="${item.Categoria}" onchange="editarProduto(${index}, 'Categoria', this.value)" /></td>
           <td><button onclick="removerProduto(${index})">Remover</button></td>
         `;
         tbody.appendChild(tr);
@@ -128,6 +128,7 @@
       const nome = document.getElementById('nome').value;
       const preco = document.getElementById('preco').value;
       const categoria = document.getElementById('categoria').value;
+
       const dados = {
         action: 'add',
         Nome: nome,
