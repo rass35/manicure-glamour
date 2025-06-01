@@ -107,10 +107,7 @@
     <div>
       <label for="service">Escolha o serviço</label>
       <select id="service" required>
-        <option value="">Selecione</option>
-        <option value="Manicure">Manicure - 💰 R$30 - ⏱️ 30min</option>
-        <option value="Pedicure">Pedicure - 💰 R$35 - ⏱️ 40min</option>
-        <option value="Combo Manicure + Pedicure">Combo Manicure + Pedicure - 💰 R$60 - ⏱️ 1h</option>
+        <option value="">Carregando serviços...</option>
       </select>
     </div>
 
@@ -168,11 +165,47 @@
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
+    function csvToArray(str, delimiter = '\t') {
+      const headers = str.slice(0, str.indexOf('\n')).split(delimiter).map(h => h.trim().toLowerCase());
+      const rows = str.slice(str.indexOf('\n') + 1).split('\n').filter(r => r.trim() !== '');
+      return rows.map(row => {
+        const values = row.split(delimiter);
+        return headers.reduce((obj, header, i) => {
+          obj[header] = values[i]?.trim() || '';
+          return obj;
+        }, {});
+      });
+    }
+
     function validateForm() {
       sendBtn.disabled = !(service.value && date.value && time.value && name.value && phone.value);
     }
 
     [service, date, time, name, phone].forEach(el => el.addEventListener('input', validateForm));
+
+    // Busca os serviços direto do Google Sheets CSV
+    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRDs0vjAw22ifuApGA0x59Y5mvwy5Jl5SVHHkx08Z67RqeeDBMNZHFpnlXeAz9-bQKp2iTfc_aMrzPH/pub?output=csv')
+      .then(response => response.text())
+      .then(csvText => {
+        const data = csvToArray(csvText);
+        service.innerHTML = '<option value="">Selecione</option>';
+
+        data.forEach(item => {
+          if(item.nome) {
+            const preco = item.preco || '0';
+            const optionText = `${item.nome} - 💰 R$${preco}`;
+            const option = document.createElement('option');
+            option.value = item.nome;
+            option.textContent = optionText;
+            service.appendChild(option);
+          }
+        });
+        validateForm();
+      })
+      .catch(err => {
+        console.error('Erro ao carregar serviços:', err);
+        service.innerHTML = '<option value="">Erro ao carregar serviços</option>';
+      });
 
     sendBtn.addEventListener('click', () => {
       const profText = professional.value ? `👩‍🏫 *Profissional:* ${professional.value}\n` : '';
