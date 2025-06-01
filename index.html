@@ -184,24 +184,28 @@
     const csvUrl = 'https://script.google.com/macros/s/AKfycbxQZ6LDzKmvTjMrGrGSSKF11KtpqekBV98Vgqst4OjGPYPn2A_-OPczzoyl91WhOabdmg/exec';
     const csvUrlNoCache = csvUrl + '&_=' + new Date().getTime();
 
-    fetch(csvUrlNoCache)
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao carregar CSV');
-        return response.text();
-      })
-      .then(text => {
-        const produtos = csvToArray(text);
-        serviceSelect.innerHTML = '<option value="">Selecione</option>';
+    fetch(`${sheetUrl}?_=${Date.now()}`)
+      .then((response) => response.json())
+      .then((categories) => {
+        let index = 0;
+        for (const [category, items] of Object.entries(categories)) {
+          const section = document.createElement('div');
+          section.className = 'category';
+          section.innerHTML = `<h3>${category}</h3>`;
+          const grid = document.createElement('div');
+          grid.className = 'products-grid';
 
-        produtos.forEach(prod => {
-          if (prod['Produto'] && prod['Preço']) {
-            const option = document.createElement('option');
-            option.value = prod['Produto'];
-            option.textContent = `${prod['Produto']} - 💰 R$${prod['Preço']}`;
-            serviceSelect.appendChild(option);
-          }
-        });
-      })
+          items.forEach((p) => {
+            products.push(p);
+            const div = document.createElement('div');
+            div.className = 'product-card';
+            div.innerHTML = `
+              <label for="prod-${index}">${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
+              <input type="number" min="0" value="0" id="prod-${index}" />
+            `;
+            grid.appendChild(div);
+            index++;
+          });
       .catch(err => {
         console.error(err);
         serviceSelect.innerHTML =
