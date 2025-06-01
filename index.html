@@ -168,7 +168,6 @@
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
-    // Converte CSV em array de objetos
     function csvToArray(str) {
       const lines = str.trim().split('\n');
       const headers = lines[0].split(',');
@@ -193,11 +192,12 @@
       .then(text => {
         const produtos = csvToArray(text);
         serviceSelect.innerHTML = '<option value="">Selecione</option>';
+
         produtos.forEach(prod => {
-          if (prod['Nome'] && prod['Preço']) {
+          if (prod['Produto'] && prod['Preço']) {
             const option = document.createElement('option');
-            option.value = prod['Nome'];
-            option.textContent = `${prod['Nome']} - 💰 R$${prod['Preço']}`;
+            option.value = prod['Produto'];
+            option.textContent = `${prod['Produto']} - 💰 R$${prod['Preço']}`;
             serviceSelect.appendChild(option);
           }
         });
@@ -237,9 +237,7 @@ ${profText}📅 *Data:* ${date.value}
 
 Aguardo a confirmação! 👍`;
 
-      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(
-        msg
-      )}`;
+      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
 
       confirmation.style.display = 'block';
