@@ -92,7 +92,7 @@
   </div>
 
   <script>
-    const URL = 'https://script.google.com/macros/s/AKfycbx_8voG8v7pnSs8yruRPnQRpbxFzlc5JBD7YbfaqJv87ZRpsZ30ESQzer7zsxSFrS23dQ/exec'; // substitua pela sua URL, se for outra
+    const URL = 'https://script.google.com/macros/s/AKfycbx_8voG8v7pnSs8yruRPnQRpbxFzlc5JBD7YbfaqJv87ZRpsZ30ESQzer7zsxSFrS23dQ/exec';
 
     function verificarSenha() {
       const senha = document.getElementById('senha').value;
@@ -120,9 +120,9 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-              <td><input value="${nome}" onchange="editarProduto(${row}, 'produto', this.value)" /></td>
-              <td><input type="number" step="0.01" value="${preco}" onchange="editarProduto(${row}, 'preco', this.value)" /></td>
-              <td><input value="${categoria}" onchange="editarProduto(${row}, 'categoria', this.value)" /></td>
+              <td><input value="${nome}" data-row="${row}" data-field="produto" onchange="editarProduto(event)" /></td>
+              <td><input type="number" step="0.01" value="${preco}" data-row="${row}" data-field="preco" onchange="editarProduto(event)" /></td>
+              <td><input value="${categoria}" data-row="${row}" data-field="categoria" onchange="editarProduto(event)" /></td>
               <td><button onclick="removerProduto(${row})">Remover</button></td>
             `;
             tbody.appendChild(tr);
@@ -147,8 +147,25 @@
         });
     }
 
-    function editarProduto(row, campo, valor) {
-      fetch(`${URL}?action=update&row=${row}&${campo}=${encodeURIComponent(valor)}`)
+    function editarProduto(event) {
+      const input = event.target;
+      const row = input.dataset.row;
+
+      // Pega a linha da tabela onde o input está
+      const tr = input.closest('tr');
+
+      // Busca todos inputs da linha para pegar os valores atualizados
+      const inputs = tr.querySelectorAll('input');
+      let categoria, produto, preco;
+
+      inputs.forEach(i => {
+        const f = i.dataset.field;
+        if (f === 'categoria') categoria = i.value;
+        else if (f === 'produto') produto = i.value;
+        else if (f === 'preco') preco = i.value;
+      });
+
+      fetch(`${URL}?action=update&row=${row}&categoria=${encodeURIComponent(categoria)}&produto=${encodeURIComponent(produto)}&preco=${encodeURIComponent(preco)}`)
         .then(() => carregarProdutos());
     }
 
