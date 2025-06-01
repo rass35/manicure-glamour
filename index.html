@@ -168,6 +168,7 @@
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
+    // Função para transformar CSV em array de objetos
     function csvToArray(str) {
       const lines = str.trim().split('\n');
       const headers = lines[0].split(',');
@@ -181,35 +182,24 @@
       });
     }
 
+    // URL da planilha Google com CSV público
     const csvUrl = 'https://script.google.com/macros/s/AKfycbxQZ6LDzKmvTjMrGrGSSKF11KtpqekBV98Vgqst4OjGPYPn2A_-OPczzoyl91WhOabdmg/exec';
-    const csvUrlNoCache = csvUrl + '&_=' + new Date().getTime();
 
-    fetch(`${sheetUrl}?_=${Date.now()}`)
-      .then((response) => response.json())
-      .then((categories) => {
-        let index = 0;
-        for (const [category, items] of Object.entries(categories)) {
-          const section = document.createElement('div');
-          section.className = 'category';
-          section.innerHTML = `<h3>${category}</h3>`;
-          const grid = document.createElement('div');
-          grid.className = 'products-grid';
-
-          items.forEach((p) => {
-            products.push(p);
-            const div = document.createElement('div');
-            div.className = 'product-card';
-            div.innerHTML = `
-              <label for="prod-${index}">${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
-              <input type="number" min="0" value="0" id="prod-${index}" />
-            `;
-            grid.appendChild(div);
-            index++;
-          });
+    fetch(`${csvUrl}?_=${Date.now()}`)
+      .then(res => res.text())
+      .then(csv => {
+        const services = csvToArray(csv);
+        serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
+        services.forEach(service => {
+          const option = document.createElement('option');
+          option.value = `${service.Serviço} - R$${parseFloat(service.Preço).toFixed(2).replace('.', ',')}`;
+          option.textContent = option.value;
+          serviceSelect.appendChild(option);
+        });
+      })
       .catch(err => {
         console.error(err);
-        serviceSelect.innerHTML =
-          '<option value="">Erro ao carregar serviços</option>';
+        serviceSelect.innerHTML = '<option value="">Erro ao carregar serviços</option>';
       });
 
     function validateForm() {
