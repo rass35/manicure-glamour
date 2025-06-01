@@ -162,31 +162,42 @@
     const sendBtn = document.getElementById('send');
     const clearBtn = document.getElementById('clear');
     const confirmation = document.getElementById('confirmation');
+
     const whatsappNumber = '5521972654357';
 
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
-    // URL do seu Web App do Apps Script
-    const scriptUrl = 'https://script.google.com/macros/s/SEU_SCRIPT_ID/exec?action=read';
+    // Converte CSV em array de objetos
+    function csvToArray(str) {
+      const lines = str.trim().split('\n');
+      const headers = lines[0].split(',');
+      return lines.slice(1).map(line => {
+        const values = line.split(',');
+        const obj = {};
+        headers.forEach((header, i) => {
+          obj[header.trim()] = values[i]?.trim();
+        });
+        return obj;
+      });
+    }
 
-    fetch(scriptUrl)
-      .then(res => res.json())
-      .then(data => {
-        const [headers, ...rows] = data;
-        const produtos = rows.map(row => ({
-          Categoria: row[0],
-          Produto: row[1],
-          Preço: row[2]
-        }));
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDs0vjAw22ifuApGA0x59Y5mvwy5Jl5SVHHkx08Z67RqeeDBMNZHFpnlXeAz9-bQKp2iTfc_aMrzPH/pub?output=csv';
+    const csvUrlNoCache = csvUrl + '&_=' + new Date().getTime();
 
+    fetch(csvUrlNoCache)
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao carregar CSV');
+        return response.text();
+      })
+      .then(text => {
+        const produtos = csvToArray(text);
         serviceSelect.innerHTML = '<option value="">Selecione</option>';
-
         produtos.forEach(prod => {
-          if (prod.Produto && prod.Preço) {
+          if (prod['Nome'] && prod['Preço']) {
             const option = document.createElement('option');
-            option.value = prod.Produto;
-            option.textContent = `${prod.Produto} - 💰 R$${prod.Preço}`;
+            option.value = prod['Nome'];
+            option.textContent = `${prod['Nome']} - 💰 R$${prod['Preço']}`;
             serviceSelect.appendChild(option);
           }
         });
@@ -230,6 +241,7 @@ Aguardo a confirmação! 👍`;
         msg
       )}`;
       window.open(url, '_blank');
+
       confirmation.style.display = 'block';
     });
 
