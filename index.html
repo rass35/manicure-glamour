@@ -1,89 +1,157 @@
+
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Agendamento - Manicure Glamour</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendamento Manicure Glamour</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: linear-gradient(to right, #ffe6f0, #fff);
-      color: #333;
-      max-width: 500px;
-      margin: auto;
+      background: linear-gradient(180deg, #ffe6f0 0%, #ffcce0 100%);
+      color: #660033;
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
       text-align: center;
-      color: #d63384;
+    }
+    form {
+      max-width: 400px;
+      width: 100%;
+      background: #fff0f5;
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 12px #ff80bf99;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
     label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
       display: block;
-      margin-top: 15px;
-      font-weight: bold;
     }
-    select, input {
+    select,
+    input[type='date'],
+    input[type='time'],
+    input[type='text'],
+    input[type='tel'] {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: #ffe6f2;
+      color: #660033;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
     }
     button {
-      width: 48%;
-      padding: 12px;
-      margin-top: 20px;
-      font-size: 16px;
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 12px;
       border: none;
-      border-radius: 5px;
+      font-weight: 700;
+      font-size: 1.05rem;
       cursor: pointer;
-    }
-    #send {
-      background-color: #28a745;
       color: white;
+      transition: background-color 0.3s ease;
     }
-    #clear {
-      background-color: #dc3545;
-      color: white;
-      float: right;
+    button#send {
+      background-color: #ff66b2;
     }
-    #confirmation {
+    button#send:hover:not(:disabled) {
+      background-color: #e0559f;
+    }
+    button#send:disabled {
+      background-color: #ff99cc88;
+      cursor: not-allowed;
+    }
+    button#clear {
+      background-color: #cc3366;
+    }
+    button#clear:hover:not(:disabled) {
+      background-color: #b32d59;
+    }
+    .confirmation {
+      background-color: #dff0d8;
+      color: #3c763d;
+      padding: 0.8rem;
+      border-radius: 10px;
+      margin-top: 1rem;
       display: none;
-      margin-top: 20px;
-      color: green;
-      font-weight: bold;
       text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>Agende seu horário</h1>
+  <h1>Manicure Glamour</h1>
+  <form id="bookingForm" onsubmit="return false;">
+    <div>
+      <label for="service">Escolha o serviço</label>
+      <select id="service" required>
+        <option value="">Carregando...</option>
+      </select>
+    </div>
 
-  <label for="service">Serviço:</label>
-  <select id="service">
-    <option value="">Carregando serviços...</option>
-  </select>
+    <div>
+      <label for="professional">Escolha a profissional (opcional)</label>
+      <select id="professional">
+        <option value="">Qualquer uma</option>
+        <option value="Ana">Ana</option>
+        <option value="Clara">Clara</option>
+        <option value="Sofia">Sofia</option>
+      </select>
+    </div>
 
-  <label for="professional">Profissional (opcional):</label>
-  <input type="text" id="professional" placeholder="Digite o nome da profissional (opcional)">
+    <div>
+      <label for="date">Data</label>
+      <input type="date" id="date" required min="" />
+    </div>
 
-  <label for="date">Data:</label>
-  <input type="date" id="date">
+    <div>
+      <label for="time">Horário</label>
+      <input type="time" id="time" required />
+    </div>
 
-  <label for="time">Horário:</label>
-  <input type="time" id="time">
+    <div>
+      <label for="name">Seu nome</label>
+      <input type="text" id="name" placeholder="Seu nome completo" required />
+    </div>
 
-  <label for="name">Seu nome:</label>
-  <input type="text" id="name" placeholder="Digite seu nome completo">
+    <div>
+      <label for="phone">Telefone</label>
+      <input
+        type="tel"
+        id="phone"
+        placeholder="(xx) xxxxx-xxxx"
+        required
+        pattern="[0-9\s\-\+\(\)]{8,}"
+      />
+    </div>
 
-  <label for="phone">Telefone (WhatsApp):</label>
-  <input type="tel" id="phone" placeholder="(DDD) 90000-0000">
+    <div class="buttons">
+      <button id="send" disabled>Confirmar e Enviar</button>
+      <button id="clear" type="button">Limpar</button>
+    </div>
+  </form>
 
-  <div style="display: flex; justify-content: space-between;">
-    <button id="send" disabled>Agendar via WhatsApp</button>
-    <button id="clear">Limpar</button>
+  <div class="confirmation" id="confirmation">
+    ✅ Seu agendamento foi enviado com sucesso! Aguarde nossa confirmação pelo WhatsApp.
   </div>
-
-  <div id="confirmation">✅ Mensagem enviada para o WhatsApp!</div>
 
   <script>
     const serviceSelect = document.getElementById('service');
@@ -96,63 +164,84 @@
     const clearBtn = document.getElementById('clear');
     const confirmation = document.getElementById('confirmation');
 
-    const whatsappNumber = '5521972654357'; // Coloque seu número com DDI
+    const whatsappNumber = '5521972654357';
 
-    // Define a data mínima como hoje
-    date.min = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    date.min = today;
 
-    // Função para converter CSV para array de objetos
     function csvToArray(str) {
-      const rows = str.trim().split('\n');
-      const headers = rows[0].split(',');
-      return rows.slice(1).map(row => {
-        const values = row.split(',');
+      const lines = str.trim().split('\n');
+      const headers = lines[0].split(',');
+      return lines.slice(1).map(line => {
+        const values = line.split(',');
         const obj = {};
-        headers.forEach((header, i) => obj[header.trim()] = values[i].trim());
+        headers.forEach((header, i) => {
+          obj[header.trim()] = values[i]?.trim();
+        });
         return obj;
       });
     }
 
-    // Carrega serviços a partir da URL do Google Apps Script
-    const csvUrl = 'https://script.google.com/macros/s/AKfycbxQZ6LDzKmvTjMrGrGSSKF11KtpqekBV98Vgqst4OjGPYPn2A_-OPczzoyl91WhOabdmg/exec';
+    const jsonUrl = 'https://script.google.com/macros/s/AKfycbxQZ6LDzKmvTjMrGrGSSKF11KtpqekBV98Vgqst4OjGPYPn2A_-OPczzoyl91WhOabdmg/exec';
 
-    fetch(csvUrl)
-      .then(res => res.text())
-      .then(csvText => {
-        const data = csvToArray(csvText);
-        serviceSelect.innerHTML = '<option value="">Selecione um serviço</option>';
-        data.forEach(item => {
-          const nome = item.Serviço || item.Nome || item[Object.keys(item)[0]];
-          const preco = item.Preço || item.Valor || '';
-          const option = document.createElement('option');
-          option.value = nome;
-          option.textContent = preco ? `${nome} - R$ ${preco}` : nome;
-          serviceSelect.appendChild(option);
-        });
-      })
-      .catch(() => {
-        serviceSelect.innerHTML = '<option value="">Erro ao carregar serviços</option>';
-      });
+fetch(jsonUrl)
+  .then(response => {
+    if (!response.ok) throw new Error('Erro ao carregar serviços');
+    return response.json();
+  })
+  .then(data => {
+    serviceSelect.innerHTML = '<option value="">Selecione</option>';
+    data.forEach(prod => {
+      if (prod['Produto'] && prod['Preço']) {
+        const option = document.createElement('option');
+        option.value = prod['Produto'];
+        option.textContent = `${prod['Produto']} - 💰 R$${prod['Preço']}`;
+        serviceSelect.appendChild(option);
+      }
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    serviceSelect.innerHTML =
+      '<option value="">Erro ao carregar serviços</option>';
+  });
 
-    // Ativa ou desativa botão
+
     function validateForm() {
-      sendBtn.disabled = !(serviceSelect.value && date.value && time.value && name.value && phone.value);
+      sendBtn.disabled = !(
+        serviceSelect.value &&
+        date.value &&
+        time.value &&
+        name.value &&
+        phone.value
+      );
     }
 
-    [serviceSelect, date, time, name, phone].forEach(el => {
-      el.addEventListener('input', validateForm);
-    });
+    [serviceSelect, date, time, name, phone].forEach(el =>
+      el.addEventListener('input', validateForm)
+    );
 
-    // Ação do botão enviar
     sendBtn.addEventListener('click', () => {
-      const profText = professional.value ? `👩‍🏫 *Profissional:* ${professional.value}\n` : '';
-      const msg = `🙋 Olá! Gostaria de fazer um agendamento na *Manicure Glamour*.\n\n✨ *Serviço:* ${serviceSelect.value}\n${profText}📅 *Data:* ${date.value}\n⏰ *Horário:* ${time.value}\n\n👤 *Nome:* ${name.value}\n📞 *Telefone:* ${phone.value}\n\nAguardo a confirmação! 👍`;
+      const profText = professional.value
+        ? `👩‍🏫 *Profissional:* ${professional.value}\n`
+        : '';
+      const msg = `🙋 Olá! Gostaria de fazer um agendamento na *Manicure Glamour*.
+
+✨ *Serviço:* ${serviceSelect.value}
+${profText}📅 *Data:* ${date.value}
+⏰ *Horário:* ${time.value}
+
+👤 *Nome:* ${name.value}
+📞 *Telefone:* ${phone.value}
+
+Aguardo a confirmação! 👍`;
+
       const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
+
       confirmation.style.display = 'block';
     });
 
-    // Ação do botão limpar
     clearBtn.addEventListener('click', () => {
       serviceSelect.value = '';
       professional.value = '';
@@ -160,9 +249,11 @@
       time.value = '';
       name.value = '';
       phone.value = '';
-      confirmation.style.display = 'none';
       sendBtn.disabled = true;
+      confirmation.style.display = 'none';
     });
+
+    validateForm();
   </script>
 </body>
 </html>
