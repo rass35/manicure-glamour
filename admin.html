@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin - Manicure Glamour</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffe6f0;
+      margin: 0;
+      padding: 20px;
+      color: #660033;
+    }
+    h1 {
+      text-align: center;
+    }
+    #login, #admin {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff0f5;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ff80bf99;
+    }
+    label, input, button, select {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    button {
+      background: #cc3366;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #b32d59;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #cc3366;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Painel Admin - Glamour</h1>
+
+  <div id="login">
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" placeholder="Digite a senha...">
+    <button onclick="verificarSenha()">Entrar</button>
+  </div>
+
+  <div id="admin" class="hidden">
+    <h2>Gerenciar Produtos</h2>
+    <form onsubmit="adicionarProduto(event)">
+      <input type="text" id="nome" placeholder="Nome do produto" required>
+      <input type="number" step="0.01" id="preco" placeholder="Preço" required>
+      <input type="text" id="categoria" placeholder="Categoria" required>
+      <button type="submit">Adicionar Produto</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Preço</th>
+          <th>Categoria</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaProdutos"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const URL = 'https://script.google.com/macros/s/AKfycbz88PHLW1w8p7y0SOqWR-I7ZSGP2MpSxCdMTY84Spxr6BSrAkVs_ghGKhWHbi7UA7aPRQ/exec';
+
+    function verificarSenha() {
+      const senha = document.getElementById('senha').value;
+      if (senha === '123') {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('admin').classList.remove('hidden');
+        carregarProdutos();
+      } else {
+        alert('Senha incorreta!');
+      }
+    }
+
+    async function carregarProdutos() {
+      const res = await fetch(URL);
+      const dados = await res.json();
+      const tbody = document.getElementById('tabelaProdutos');
+      tbody.innerHTML = '';
+
+      dados.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input value="${item.Nome}" onchange="editarProduto(${index}, 'Nome', this.value)"></td>
+          <td><input type="number" step="0.01" value="${item.Preco}" onchange="editarProduto(${index}, 'Preco', this.value)"></td>
+          <td><input value="${item.Categoria}" onchange="editarProduto(${index}, 'Categoria', this.value)"></td>
+          <td><button onclick="removerProduto(${index})">Remover</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function adicionarProduto(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const preco = document.getElementById('preco').value;
+      const categoria = document.getElementById('categoria').value;
+      const dados = { action: 'add', Nome: nome, Preco: preco, Categoria: categoria };
+
+      await fetch(URL, {
+        method: 'POST',
+        body: JSON.stringify(dados),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      document.getElementById('nome').value = '';
+      document.getElementById('preco').value = '';
+      document.getElementById('categoria').value = '';
+      carregarProdutos();
+    }
+
+    async function editarProduto(index, campo, valor) {
+      const dados = { action: 'edit', index, campo, valor };
+      await fetch(URL, {
+        method: 'POST',
+        body: JSON.stringify(dados),
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    async function removerProduto(index) {
+      const dados = { action: 'delete', index };
+      await fetch(URL, {
+        method: 'POST',
+        body: JSON.stringify(dados),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      carregarProdutos();
+    }
+  </script>
+</body>
+</html>
