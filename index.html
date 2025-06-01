@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agendamento Manicure Glamour</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <style>
     body {
       background: linear-gradient(180deg, #ffe6f0 0%, #ffcce0 100%);
@@ -43,7 +43,11 @@
       display: block;
     }
 
-    select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"] {
+    select,
+    input[type='date'],
+    input[type='time'],
+    input[type='text'],
+    input[type='tel'] {
       width: 100%;
       padding: 0.6rem 0.8rem;
       border-radius: 10px;
@@ -138,7 +142,13 @@
 
     <div>
       <label for="phone">Telefone</label>
-      <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required pattern="[0-9\s\-\+\(\)]{8,}" />
+      <input
+        type="tel"
+        id="phone"
+        placeholder="(xx) xxxxx-xxxx"
+        required
+        pattern="[0-9\s\-\+\(\)]{8,}"
+      />
     </div>
 
     <div class="buttons">
@@ -147,10 +157,12 @@
     </div>
   </form>
 
-  <div class="confirmation" id="confirmation">✅ Seu agendamento foi enviado com sucesso! Aguarde nossa confirmação pelo WhatsApp.</div>
+  <div class="confirmation" id="confirmation">
+    ✅ Seu agendamento foi enviado com sucesso! Aguarde nossa confirmação pelo WhatsApp.
+  </div>
 
   <script>
-    const service = document.getElementById('service');
+    const serviceSelect = document.getElementById('service');
     const professional = document.getElementById('professional');
     const date = document.getElementById('date');
     const time = document.getElementById('time');
@@ -165,70 +177,22 @@
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
-    function csvToArray(str, delimiter = '\t') {
-      const headers = str.slice(0, str.indexOf('\n')).split(delimiter).map(h => h.trim().toLowerCase());
-      const rows = str.slice(str.indexOf('\n') + 1).split('\n').filter(r => r.trim() !== '');
-      return rows.map(row => {
-        const values = row.split(delimiter);
-        return headers.reduce((obj, header, i) => {
-          obj[header] = values[i]?.trim() || '';
-          return obj;
-        }, {});
-      });
-    }
-
     function validateForm() {
-      sendBtn.disabled = !(service.value && date.value && time.value && name.value && phone.value);
+      sendBtn.disabled = !(
+        serviceSelect.value &&
+        date.value &&
+        time.value &&
+        name.value &&
+        phone.value
+      );
     }
 
-    [service, date, time, name, phone].forEach(el => el.addEventListener('input', validateForm));
-
-    // Busca os serviços direto do Google Sheets CSV
-    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRDs0vjAw22ifuApGA0x59Y5mvwy5Jl5SVHHkx08Z67RqeeDBMNZHFpnlXeAz9-bQKp2iTfc_aMrzPH/pub?output=csv')
-      .then(response => response.text())
-      .then(csvText => {
-        const data = csvToArray(csvText);
-        service.innerHTML = '<option value="">Selecione</option>';
-
-        data.forEach(item => {
-          if(item.nome) {
-            const preco = item.preco || '0';
-            const optionText = `${item.nome} - 💰 R$${preco}`;
-            const option = document.createElement('option');
-            option.value = item.nome;
-            option.textContent = optionText;
-            service.appendChild(option);
-          }
-        });
-        validateForm();
-      })
-      .catch(err => {
-        console.error('Erro ao carregar serviços:', err);
-        service.innerHTML = '<option value="">Erro ao carregar serviços</option>';
-      });
-
-    sendBtn.addEventListener('click', () => {
-      const profText = professional.value ? `👩‍🏫 *Profissional:* ${professional.value}\n` : '';
-      const msg = 
-`\ud83d\ude4b Olá! Gostaria de fazer um agendamento na *Manicure Glamour*.
-
-✨ *Serviço:* ${service.value}
-${profText}📅 *Data:* ${date.value}
-⏰ *Horário:* ${time.value}
-
-👤 *Nome:* ${name.value}
-📞 *Telefone:* ${phone.value}
-
-Aguardo a confirmação! 👍`;
-
-      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
-
-      confirmation.style.display = 'block';
-    });
+    [serviceSelect, date, time, name, phone].forEach((el) =>
+      el.addEventListener('input', validateForm)
+    );
 
     clearBtn.addEventListener('click', () => {
-      service.value = '';
+      serviceSelect.value = '';
       professional.value = '';
       date.value = '';
       time.value = '';
@@ -237,6 +201,72 @@ Aguardo a confirmação! 👍`;
       sendBtn.disabled = true;
       confirmation.style.display = 'none';
     });
+
+    sendBtn.addEventListener('click', () => {
+      const profText = professional.value
+        ? `👩‍🏫 *Profissional:* ${professional.value}\n`
+        : '';
+      const msg = `🙋 Olá! Gostaria de fazer um agendamento na *Manicure Glamour*.
+
+✨ *Serviço:* ${serviceSelect.value}
+${profText}📅 *Data:* ${date.value}
+⏰ *Horário:* ${time.value}
+
+👤 *Nome:* ${name.value}
+📞 *Telefone:* ${phone.value}
+
+Aguardo a confirmação! 👍`;
+
+      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(
+        msg
+      )}`;
+      window.open(url, '_blank');
+
+      confirmation.style.display = 'block';
+    });
+
+    function csvToArray(str, delimiter = ',') {
+      const headers = str
+        .slice(0, str.indexOf('\n'))
+        .split(delimiter)
+        .map((h) => h.trim());
+      const rows = str.slice(str.indexOf('\n') + 1).split('\n');
+
+      return rows
+        .map((row) => {
+          const values = row.split(delimiter).map((v) => v.trim());
+          let obj = {};
+          headers.forEach((header, i) => (obj[header] = values[i]));
+          return obj;
+        })
+        .filter((obj) => obj['Nome']);
+    }
+
+    const csvUrl =
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDs0vjAw22ifuApGA0x59Y5mvwy5Jl5SVHHkx08Z67RqeeDBMNZHFpnlXeAz9-bQKp2iTfc_aMrzPH/pub?output=csv';
+
+    fetch(csvUrl)
+      .then((response) => {
+        if (!response.ok) throw new Error('Erro ao carregar CSV');
+        return response.text();
+      })
+      .then((text) => {
+        const produtos = csvToArray(text);
+
+        serviceSelect.innerHTML = '<option value="">Selecione</option>';
+
+        produtos.forEach((prod) => {
+          const option = document.createElement('option');
+          option.value = prod['Nome'];
+          option.textContent = `${prod['Nome']} - 💰 R$${prod['Preço']} - Categoria: ${prod['Categoria']}`;
+          serviceSelect.appendChild(option);
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        serviceSelect.innerHTML =
+          '<option value="">Erro ao carregar serviços</option>';
+      });
 
     validateForm();
   </script>
