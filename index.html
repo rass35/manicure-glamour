@@ -171,17 +171,18 @@
 
     // Função para converter CSV para array de objetos
     function csvToArray(str) {
-      const lines = str.trim().split('\n');
-      const headers = lines[0].split('\t');
-      return lines.slice(1).map(line => {
-        const values = line.split('\t');
-        const obj = {};
-        headers.forEach((header, i) => {
-          obj[header] = values[i];
-        });
-        return obj;
-      });
-    }
+  const lines = str.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const values = line.split(',');
+    const obj = {};
+    headers.forEach((header, i) => {
+      obj[header.trim()] = values[i]?.trim();
+    });
+    return obj;
+  });
+}
+
 
     // URL do CSV público do Google Sheets
     const csvUrl =
